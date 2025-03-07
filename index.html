@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Vibes</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .sign {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .date {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+        .reading {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .detail-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .detail-label {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 50px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="content">
+            <div class="loading">Loading your daily horoscope...</div>
+        </div>
+    </div>
+
+    <script>
+        // Get zodiac sign from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const sign = urlParams.get('sign');
+
+        async function fetchHoroscope(sign) {
+            try {
+                const response = await fetch(`https://aztro.sameerkumar.website?sign=${sign}&day=today`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                document.getElementById('content').innerHTML = `
+                    <div class="sign">${sign.charAt(0).toUpperCase() + sign.slice(1)}</div>
+                    <div class="date">${data.current_date}</div>
+                    <div class="reading">${data.description}</div>
+                    <div class="details">
+                        <div class="detail-box">
+                            <div class="detail-label">Lucky Number</div>
+                            <div class="detail-value">${data.lucky_number}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Lucky Time</div>
+                            <div class="detail-value">${data.lucky_time}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Color</div>
+                            <div class="detail-value">${data.color}</div>
+                        </div>
+                        <div class="detail-box">
+                            <div class="detail-label">Mood</div>
+                            <div class="detail-value">${data.mood}</div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('content').innerHTML = `
+                    <div class="reading" style="text-align: center; color: #ffcccc;">
+                        Sorry, we couldn't load your horoscope right now. Please try again later.
+                    </div>
+                `;
+            }
+        }
+
+        if (sign) {
+            fetchHoroscope(sign.toLowerCase());
+        } else {
+            document.getElementById('content').innerHTML = `
+                <div class="reading" style="text-align: center;">
+                    No zodiac sign specified. Please scan a valid horoscope tag.
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
